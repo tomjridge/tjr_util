@@ -2,17 +2,14 @@
    2) ability to track the max used part of the file *)
 
 (* open Util *)
-open Mmap_intf
-
-module Bigarray = Stdlib.Bigarray 
 
 open Bigarray
+open Mmap_intf
 
-type buffer = bigstring
-
-type t = { 
+type ('a,'b) t = { 
   fd          : Unix.file_descr; 
-  mutable buf : buffer; 
+  kind        : ('a,'b) kind;
+  mutable buf : ('a,'b,c_layout) Bigarray.Array1.t; 
 }
 
 open Unix
@@ -21,6 +18,8 @@ open Unix
    64 bit machine *)
 module type S = sig 
   val int_size_is_geq_63: bool
+
+  (** Measured in terms of number of elts, not bytes *)
   val mmap_increment_size: int 
 end
 
@@ -28,12 +27,14 @@ module Make_1(S:S) = struct
   open S
   let _ = assert(int_size_is_geq_63 && Sys.int_size >= 63)
 
-  type nonrec t = t
+  type nonrec ('a,'b) t = ('a,'b) t
 
-  let map fd sz = 
+  let empty_buffer kind = Bigarray.Array1.create kind c_layout 0
+
+  let map fd kind sz = 
     let shared = true in
     let buf = 
-      Unix.map_file fd Char c_layout shared [| sz |] 
+      Unix.map_file fd kind c_layout shared [| sz |] 
       |> array1_of_genarray
     in
     buf
@@ -41,24 +42,28 @@ module Make_1(S:S) = struct
   let remap sz t = 
     Printf.printf "Resizing %d\n" sz;
     (* release old buffer *)
-    t.buf <- Bigstringaf.create 0;
+    t.buf <- empty_buffer t.kind;
     (* force collection of old buffer; perhaps try to detect
        finalization *)
     Gc.full_major ();
     (* create new map *)
-    let buf = map t.fd sz in
+    let buf = map t.fd t.kind sz in
     t.buf <- buf 
     
+
+  let bytes_per_elt = Bigarray.kind_size_in_bytes 
+
+
   (* NOTE public functions from here *)
   
   (* FIXME shared is always true? if we are unmapping and remapping,
      we presumably want the new data to be changed *)
-  let of_fd fd = 
+  let of_fd fd kind = 
     let sz = (Unix.fstat fd).st_size in
     (* NOTE we don't increase the size at this point; that can happen
        later *)
-    let buf = map fd sz in
-    { fd; buf }
+    let buf = map fd kind (sz/bytes_per_elt kind) in
+    { fd; kind; buf }
 
   let length t = Array1.dim t.buf 
 
@@ -72,12 +77,14 @@ module Make_1(S:S) = struct
 
   let msync t = Msync.msync (genarray_of_array1 t.buf)
       
-  let fstat t = Unix.fstat t.fd
+  (* let fstat t = Unix.fstat t.fd *)
 
   let close t = 
     msync t;
-    t.buf <- Bigstringaf.create 0;
+    t.buf <- empty_buffer t.kind;
     Gc.full_major ();
     Unix.close t.fd
 end
 
+
+module Make_2(S:S) : Mmap_intf.S = Make_1(S)
