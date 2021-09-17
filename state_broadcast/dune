@@ -1,0 +1,6 @@
+(library
+ (public_name "state_broadcast")
+ (name "state_broadcast")
+ (preprocess (pps ppx_bin_prot))
+ (libraries mmap bin_prot))
+
