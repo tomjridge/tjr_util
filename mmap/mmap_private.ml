@@ -18,9 +18,6 @@ open Unix
    64 bit machine *)
 module type S = sig 
   val int_size_is_geq_63: bool
-
-  (** Measured in terms of number of elts, not bytes *)
-  val mmap_increment_size: int 
 end
 
 module Make_1(S:S) = struct
@@ -28,6 +25,15 @@ module Make_1(S:S) = struct
   let _ = assert(int_size_is_geq_63 && Sys.int_size >= 63)
 
   type nonrec ('a,'b) t = ('a,'b) t
+
+  let const_1Bi = 1073741824
+
+  (* double up to 1B, then grow by 1B each time *)
+  let next_sz sz = 
+    match () with
+    | _ when sz >= const_1Bi -> sz + const_1Bi
+    | _ when sz < 64 -> 128
+    | _ -> sz * 2
 
   let empty_buffer kind = Bigarray.Array1.create kind c_layout 0
 
@@ -39,6 +45,7 @@ module Make_1(S:S) = struct
     in
     buf
 
+  (* NOTE sz is the size in terms of the element involved; eg ints each take 8 bytes *)
   let remap sz t = 
     Printf.printf "Resizing %d\n" sz;
     (* release old buffer *)
@@ -46,7 +53,7 @@ module Make_1(S:S) = struct
     (* force collection of old buffer; perhaps try to detect
        finalization *)
     Gc.full_major ();
-    (* create new map *)
+    (* create new map *)    
     let buf = map t.fd t.kind sz in
     t.buf <- buf 
     
@@ -72,7 +79,7 @@ module Make_1(S:S) = struct
     match off+len <= buf_len with
     | true -> Array1.sub t.buf off len
     | false -> 
-      remap (buf_len + mmap_increment_size) t;
+      remap (next_sz (off+len)) t;
       sub t ~off ~len
 
   let msync t = Msync.msync (genarray_of_array1 t.buf)
