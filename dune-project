@@ -16,13 +16,13 @@
  (depends bigstringaf)) 
 
 (package 
- (name state_broadcast)
+ (name mmap_value)
  (synopsis "")
  (depends mmap)) 
 
-(package 
- (name std_util)
- (synopsis "")
- (depends )) 
+; (package 
+;  (name std_util)
+;  (synopsis "")
+;  (depends )) 
 
 

@@ -4,7 +4,7 @@
 (* open Util *)
 
 open Bigarray
-open Mmap_intf
+(* open Mmap_intf *)
 
 type ('a,'b) t = { 
   fd          : Unix.file_descr; 
@@ -95,3 +95,16 @@ end
 
 
 module Make_2(S:S) : Mmap_intf.S = Make_1(S)
+
+
+module Export = struct
+  include Make_2(struct 
+      let int_size_is_geq_63 = (Sys.int_size >= 63)
+    end)
+
+  type char_mmap = (char,Bigarray.int8_unsigned_elt)t
+
+  type int_mmap = (int,Bigarray.int_elt)t    
+
+end
+

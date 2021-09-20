@@ -1,25 +1,6 @@
+(** Main mmap types *)
 
-(** The first tyvar is the OCaml type; the second is the impl type *)
-(* type ('a,'b) kind = ('a,'b) Bigarray.kind *)
-
-(*
-type bigstring =
-  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
-
-type big_int_array = 
-  (int, Bigarray.int_elt, Bigarray.c_layout) Bigarray.Array1.t
-*)
-
-
-(** The kind of the mmap'ed array; see Bigarray.kind *)
-type ('a,'b) kind = ('a,'b) Bigarray.kind
-
-
-(* Convenience *)
-
-let char_kind : (char,Bigarray.int8_unsigned_elt) kind = Bigarray.Char
-
-let int_kind : (int,Bigarray.int_elt) kind = Bigarray.Int
+open Util.Type_abbrevs
 
 
 (** To write to/from the mmap, use the sub function to get the
