@@ -8,7 +8,6 @@ doc: "https://tomjridge.github.io/FIXME/ocamldoc/index.html"
 bug-reports: "https://github.com/tomjridge/FIXME/issues"
 depends: [
   "dune" {>= "2.7"}
-  "mmap"
   "odoc" {with-doc}
 ]
 build: [

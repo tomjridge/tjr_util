@@ -15,14 +15,14 @@
  (synopsis "")
  (depends bigstringaf)) 
 
-(package 
- (name mmap_value)
- (synopsis "")
- (depends mmap)) 
-
 ; (package 
-;  (name std_util)
+;  (name mmap_value)
 ;  (synopsis "")
-;  (depends )) 
+;  (depends mmap)) 
+
+(package 
+ (name std_util)
+ (synopsis "")
+ (depends )) 
 
 
