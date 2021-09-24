@@ -11,7 +11,7 @@
 
 
 (package 
- (name mmap)
+ (name tjr_mmap)
  (synopsis "")
  (depends bigstringaf)) 
 

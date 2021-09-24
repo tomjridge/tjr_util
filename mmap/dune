@@ -1,6 +1,6 @@
 (library
- (public_name "mmap")
- (name "mmap")
+ (public_name "tjr_mmap")
+ (name "tjr_mmap")
  (foreign_stubs (language c) (names caml_msync)) ; NOTE taken from plebeia
  (libraries bigstringaf ))
 
