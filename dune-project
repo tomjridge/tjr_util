@@ -12,7 +12,7 @@
 
 (package 
  (name tjr_mmap)
- (synopsis "")
+ (synopsis "Extensible mmap")
  (depends bigstringaf)) 
 
 ; (package 
@@ -22,7 +22,7 @@
 
 (package 
  (name std_util)
- (synopsis "")
+ (synopsis "FIXME")
  (depends )) 
 
 
