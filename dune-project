@@ -1,5 +1,5 @@
 (lang dune 2.7)
-(name tjr_util)
+(name tjr_mmap)
 
 ;; for opam
 (authors              "Tom Ridge <tom.j.ridge@googlemail.com>")
