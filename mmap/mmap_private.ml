@@ -47,7 +47,7 @@ module Make_1(S:S) = struct
 
   (* NOTE sz is the size in terms of the element involved; eg ints each take 8 bytes *)
   let remap sz t = 
-    Printf.printf "Resizing %d\n" sz;
+    Printf.printf "Resizing %d\n%!" sz;
     (* release old buffer *)
     t.buf <- empty_buffer t.kind;
     (* force collection of old buffer; perhaps try to detect
