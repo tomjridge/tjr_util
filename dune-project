@@ -15,6 +15,11 @@
  (synopsis "Extensible mmap")
  (depends bigstringaf)) 
 
+(package 
+ (name unixfile)
+ (synopsis "Unix file IO (pread, pwrite)")
+ (depends unix))
+
 ; (package 
 ;  (name mmap_value)
 ;  (synopsis "")
